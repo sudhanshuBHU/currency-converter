@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { FadeLoader } from 'react-spinners';
+import { ArrowRightLeft } from 'lucide-react';
 
 export default function Home() {
   const [amount, setAmount] = useState(1);
@@ -40,6 +41,12 @@ export default function Home() {
     setToCurrency(e.target.value);
   };
 
+  const handleExchange = () => {
+    const temp = fromCurrency;
+    setFromCurrency(toCurrency);
+    setToCurrency(temp);
+  };
+
   const convertedAmount = amount * exchangeRate;
 
   return (
@@ -68,7 +75,7 @@ export default function Home() {
                     </option>
                   ))}
                 </select>
-                <span className="mx-2">to</span>
+                <span className="mx-2" onClick={handleExchange}><ArrowRightLeft /></span>
                 <select
                   value={toCurrency}
                   onChange={handleToCurrencyChange}
