@@ -1,101 +1,85 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect } from 'react';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [amount, setAmount] = useState(1);
+  const [fromCurrency, setFromCurrency] = useState('usd');
+  const [toCurrency, setToCurrency] = useState('inr');
+  const [exchangeRate, setExchangeRate] = useState(1);
+  const [currencies, setCurrencies] = useState([]);
+  const [date, setDate] = useState('');
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+
+    const fetchExchangeRates = async () => {
+      const response = await fetch(`https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${fromCurrency}.json`);
+      const data = await response.json(); 
+      setDate(data.date);    
+      // console.log(data);      
+      // console.log(data[`${fromCurrency}`]);
+      setCurrencies(Object.keys(data[`${fromCurrency}`]));
+      setExchangeRate(data[`${fromCurrency}`][`${toCurrency}`]);
+    };
+    fetchExchangeRates();
+  },[toCurrency, fromCurrency]);
+
+  const handleAmountChange = (e) => {
+    setAmount(e.target.value);
+  };
+
+  const handleFromCurrencyChange = (e) => {
+    setFromCurrency(e.target.value);
+  };
+
+  const handleToCurrencyChange = (e) => {
+    setToCurrency(e.target.value);
+  };
+
+  const convertedAmount = amount * exchangeRate;
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
+        <h1 className="text-2xl font-bold mb-4 text-center">Currency Converter</h1>
+        <div className="mb-4">
+          <input
+            type="number"
+            value={amount}
+            onChange={handleAmountChange}
+            className="w-full p-2 border border-gray-300 rounded mb-2"
+          />
+          <div className="flex justify-between items-center mb-2">
+            <select
+              value={fromCurrency}
+              onChange={handleFromCurrencyChange}
+              className="w-1/2 p-2 border border-gray-300 rounded mr-2"
+            >
+              {currencies.map((currency) => (
+                <option key={currency} value={currency}>
+                  {currency.toUpperCase()}
+                </option>
+              ))}
+            </select>
+            <span className="mx-2">to</span>
+            <select
+              value={toCurrency}
+              onChange={handleToCurrencyChange}
+              className="w-1/2 p-2 border border-gray-300 rounded ml-2"
+            >
+              {currencies.map((currency) => (
+                <option key={currency} value={currency}>
+                  {currency.toUpperCase()}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <h2 className="text-xl font-semibold text-center">
+          {amount} {fromCurrency.toUpperCase()} is equal to {convertedAmount.toFixed(2)} {toCurrency.toUpperCase()}
+        </h2>
+        <p className='text-right mt-2 text-blue-500'>Last Updated on {date}</p>
+      </div>
     </div>
   );
 }
